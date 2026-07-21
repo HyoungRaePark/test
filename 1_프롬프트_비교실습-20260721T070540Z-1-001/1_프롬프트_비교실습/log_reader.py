@@ -68,3 +68,8 @@ print(f"\n전체: {total}")
 print(f"파싱성공: {success}")
 print(f"건너뛴 줄: {fail}")
 print(f"\n")
+
+# git status
+# git add .
+# git commit -m "수정 내용"
+# # git push
