@@ -171,6 +171,105 @@
 # 🏁 0~23시 순서대로 정렬되어 출력되면 성공!
 
 # TODO: AI에게 받은 코드를 검증 후 여기에 붙여넣기
+# import re
+# from pathlib import Path
+
+# parse_line = Path(__file__).parent / "access.log"
+
+# log_pattern = re.compile(
+#     r'(?P<ip>\S+)\s+-\s+-\s+'
+#     r'\[(?P<datetime>[^\]]+)\]\s+'
+#     r'"(?P<method>\S+)\s+'
+#     r'(?P<path>\S+)\s+'
+#     r'(?P<protocol>[^"]+)"\s+'
+#     r'(?P<status>\d{3})\s+'
+#     r'(?P<size>\d+)'
+# )
+
+# total_lines = 0
+# success_lines = 0
+# failed_lines = 0
+# printed = 0
+
+
+# print("\n=======처음 5줄=======\n")
+
+# with open(parse_line, "r", encoding="utf-8") as f:
+#     hourly_counts = {}
+#     # 시간체크
+#     status_counts = {}
+#     # {200: 1}                # 첫 번째 200
+#     # {200: 1, 404: 1}        # 404 등장
+#     for line in f:
+#         total_lines += 1
+#         line = line.strip()
+
+#         if not line:
+#             failed_lines += 1
+#             continue
+
+#         match = log_pattern.fullmatch(line)
+#         if match:
+#             code = int(match.group("status"))
+#             # 처음 등장한 상태코드는 0으로 시작하고, 이후 등장할 때마다 1씩 증가.
+#             status_counts[code] = status_counts.get(code, 0) + 1
+#             time_str = match.group("datetime")
+#             hour = time_str.split(":")[1]   # "14"처럼 두 자리 문자열
+#             hourly_counts[hour] = hourly_counts.get(hour, 0) + 1
+#             success_lines += 1
+#             result = {
+#                 "ip": match.group("ip"),
+#                 "datetime": match.group("datetime"),
+#                 "method": match.group("method"),
+#                 "url": match.group("path"),
+#                 "status": int(match.group("status"))
+#             }
+#             if printed < 5:
+#                 print(result)
+#                 print("\n")
+#                 printed += 1
+#         else:
+#             failed_lines += 1
+
+
+# total_status = sum(status_counts.values())
+
+
+# print(f"\n전체 줄 수: {total_lines} / 건너뛴 줄 수: {failed_lines} / 파싱 성공: {success_lines}\n")
+
+
+# print("============ 상태 코드별 요청 수 ============\n")
+
+# for code in sorted(status_counts):
+#     print(f"{code} 응답: {status_counts[code]}")
+
+
+# print(f"\n상태코드 합계: {total_status}\n")
+
+
+# print("============ 시간대별 요청수 ============\n")
+
+# for hour in sorted(hourly_counts.keys()):
+#     print(f"{hour}시: {hourly_counts[hour]}")
+
+# --- 단계 4. 에러 URL TOP 5 ---
+# 요구사항
+#   - 상태코드가 400 이상인 요청만 대상으로 URL별 발생 횟수를 집계한다
+#   - 발생 횟수가 많은 순서로 상위 5개를 출력한다
+# 🤔 힌트: 값 기준 내림차순 정렬 후 상위 5개 자르기
+#   top5 = sorted(error_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+#   for rank, (url, cnt) in enumerate(top5, start=1):
+#       print(f"{rank}위: {url} ({cnt}회)")
+#   lambda가 낯설다면 AI에게 이 두 줄의 동작 설명을 요청해 보세요.
+# 기대 출력 형식
+#   === 에러 최다 URL TOP 5 ===
+#   1위: /api/payment (37회)
+# 🏁 에러 URL 상위 5개가 횟수와 함께 출력되면 성공!
+# ⚠️ 출력까지 끝났다면, 마무리의 json 저장에서 쓸 수 있도록
+#    아래 한 줄을 추가해 top_error_urls 변수를 만들어 두세요.
+#   top_error_urls = [list(t) for t in top5]   # [[URL, 횟수], ...] 형태
+
+# TODO: AI에게 받은 코드를 검증 후 여기에 붙여넣기
 import re
 from pathlib import Path
 
@@ -196,10 +295,9 @@ print("\n=======처음 5줄=======\n")
 
 with open(parse_line, "r", encoding="utf-8") as f:
     hourly_counts = {}
-    # 시간체크
     status_counts = {}
-    # {200: 1}                # 첫 번째 200
-    # {200: 1, 404: 1}        # 404 등장
+    error_url_counts = {}
+
     for line in f:
         total_lines += 1
         line = line.strip()
@@ -209,67 +307,74 @@ with open(parse_line, "r", encoding="utf-8") as f:
             continue
 
         match = log_pattern.fullmatch(line)
+
         if match:
             code = int(match.group("status"))
-            # 처음 등장한 상태코드는 0으로 시작하고, 이후 등장할 때마다 1씩 증가.
+            url = match.group("path")
+
+            # 상태코드별 요청 수 집계
             status_counts[code] = status_counts.get(code, 0) + 1
+
+            # 시간대별 요청 수 집계
             time_str = match.group("datetime")
-            hour = time_str.split(":")[1]   # "14"처럼 두 자리 문자열
+            hour = time_str.split(":")[1]
             hourly_counts[hour] = hourly_counts.get(hour, 0) + 1
+
+            # 상태코드가 400 이상인 URL만 집계
+            if code >= 400:
+                error_url_counts[url] = error_url_counts.get(url, 0) + 1
+
             success_lines += 1
+
             result = {
                 "ip": match.group("ip"),
                 "datetime": match.group("datetime"),
                 "method": match.group("method"),
-                "url": match.group("path"),
-                "status": int(match.group("status"))
+                "url": url,
+                "status": code
             }
+
             if printed < 5:
                 print(result)
-                print("\n")
+                print()
                 printed += 1
+
         else:
             failed_lines += 1
 
 
 total_status = sum(status_counts.values())
 
+top_error_urls = sorted(
+    error_url_counts.items(),
+    key=lambda x: x[1],
+    reverse=True
+)[:5]
 
-print(f"\n전체 줄 수: {total_lines} / 건너뛴 줄 수: {failed_lines} / 파싱 성공: {success_lines}\n")
 
+print(
+    f"\n전체 줄 수: {total_lines} / "
+    f"건너뛴 줄 수: {failed_lines} / "
+    f"파싱 성공: {success_lines}\n"
+)
 
 print("============ 상태 코드별 요청 수 ============\n")
 
 for code in sorted(status_counts):
     print(f"{code} 응답: {status_counts[code]}")
 
-
 print(f"\n상태코드 합계: {total_status}\n")
 
+print("\n=== 에러 최다 URL TOP 5 ===")
 
-print("============ 시간대별 요청수 ============\n")
+for rank, (url, count) in enumerate(top_error_urls, start=1):
+    print(f"{rank}위: {url} ({count}회)")
 
-for hour in sorted(hourly_counts.keys()):
-    print(f"{hour}시: {hourly_counts[hour]}")
 
-# --- 단계 4. 에러 URL TOP 5 ---
-# 요구사항
-#   - 상태코드가 400 이상인 요청만 대상으로 URL별 발생 횟수를 집계한다
-#   - 발생 횟수가 많은 순서로 상위 5개를 출력한다
-# 🤔 힌트: 값 기준 내림차순 정렬 후 상위 5개 자르기
-#   top5 = sorted(error_counts.items(), key=lambda x: x[1], reverse=True)[:5]
-#   for rank, (url, cnt) in enumerate(top5, start=1):
-#       print(f"{rank}위: {url} ({cnt}회)")
-#   lambda가 낯설다면 AI에게 이 두 줄의 동작 설명을 요청해 보세요.
-# 기대 출력 형식
-#   === 에러 최다 URL TOP 5 ===
-#   1위: /api/payment (37회)
-# 🏁 에러 URL 상위 5개가 횟수와 함께 출력되면 성공!
-# ⚠️ 출력까지 끝났다면, 마무리의 json 저장에서 쓸 수 있도록
-#    아래 한 줄을 추가해 top_error_urls 변수를 만들어 두세요.
-#   top_error_urls = [list(t) for t in top5]   # [[URL, 횟수], ...] 형태
+# print("============ 시간대별 요청수 ============\n")
 
-# TODO: AI에게 받은 코드를 검증 후 여기에 붙여넣기
+# for hour in sorted(hourly_counts.keys()):
+#     print(f"{hour}시: {hourly_counts[hour]}")
 
 
 # --- 마무리. 결과를 results.json으로 저장 ---
@@ -278,14 +383,14 @@ for hour in sorted(hourly_counts.keys()):
 #   한 글자도 바꾸지 마세요. 내일 대시보드와 연결되는 이름입니다.
 
 # import json
-#
+
 # results = {
 #     "status_counts": status_counts,
 #     "hourly_counts": hourly_counts,
 #     "top_error_urls": top_error_urls
 # }
-#
+
 # with open("results.json", "w", encoding="utf-8") as f:
 #     json.dump(results, f, ensure_ascii=False, indent=2)
-#
+
 # print("results.json 저장 완료")

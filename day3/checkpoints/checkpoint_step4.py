@@ -81,15 +81,15 @@ for rank, (url, cnt) in enumerate(top5, start=1):
 top_error_urls = [list(t) for t in top5]           # json 저장용 [URL, 횟수] 리스트
 
 # ---------- 마무리. results.json 저장 ----------
-import json
+# import json
 
-results = {
-    "status_counts": status_counts,      # 예: {"200": 1523, "404": 87, ...}
-    "hourly_counts": hourly_counts,      # 예: {"00": 12, ..., "23": 31}
-    "top_error_urls": top_error_urls     # 예: [["/api/payment", 37], ...]
-}
+# results = {
+#     "status_counts": status_counts,      # 예: {"200": 1523, "404": 87, ...}
+#     "hourly_counts": hourly_counts,      # 예: {"00": 12, ..., "23": 31}
+#     "top_error_urls": top_error_urls     # 예: [["/api/payment", 37], ...]
+# }
 
-with open("results.json", "w", encoding="utf-8") as f:
-    json.dump(results, f, ensure_ascii=False, indent=2)
+# with open("results.json", "w", encoding="utf-8") as f:
+#     json.dump(results, f, ensure_ascii=False, indent=2)
 
-print("\nresults.json 저장 완료")
+# print("\nresults.json 저장 완료")
