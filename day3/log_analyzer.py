@@ -297,6 +297,7 @@ with open(parse_line, "r", encoding="utf-8") as f:
     hourly_counts = {}
     status_counts = {}
     error_url_counts = {}
+    ip_counts = {}
 
     for line in f:
         total_lines += 1
@@ -311,6 +312,9 @@ with open(parse_line, "r", encoding="utf-8") as f:
         if match:
             code = int(match.group("status"))
             url = match.group("path")
+            # ip 접속 많은 횟수 분류 
+            ip = match.group("ip")   
+
 
             # 상태코드별 요청 수 집계
             status_counts[code] = status_counts.get(code, 0) + 1
@@ -323,6 +327,9 @@ with open(parse_line, "r", encoding="utf-8") as f:
             # 상태코드가 400 이상인 URL만 집계
             if code >= 400:
                 error_url_counts[url] = error_url_counts.get(url, 0) + 1
+
+            # ip 접속이 많은 순으로 집계
+            ip_counts[ip] = ip_counts.get(ip,0)+1
 
             success_lines += 1
 
@@ -352,6 +359,12 @@ top_error_urls = sorted(
 )[:5]
 
 
+top_ip = sorted(
+    ip_counts.items(),
+    key=lambda x: x[1],
+    reverse=True
+)[:5]
+
 print(
     f"\n전체 줄 수: {total_lines} / "
     f"건너뛴 줄 수: {failed_lines} / "
@@ -370,6 +383,11 @@ print("\n=== 에러 최다 URL TOP 5 ===")
 for rank, (url, count) in enumerate(top_error_urls, start=1):
     print(f"{rank}위: {url} ({count}회)")
 
+
+print("\n=== IP 요청 최다 TOP 5 ===")
+
+for rank, (ip, count) in enumerate(top_ip, start=1):
+    print(f"{rank}위: {ip} ({count}회)")    
 
 # print("============ 시간대별 요청수 ============\n")
 
