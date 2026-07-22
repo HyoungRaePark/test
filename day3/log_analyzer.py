@@ -24,6 +24,153 @@
 # 🏁 처음 5줄의 파싱 결과와 건너뛴 줄 수가 출력되면 성공!
 
 # TODO: AI에게 받은 코드를 검증 후 여기에 붙여넣기
+# import re
+# from pathlib import Path
+
+# parse_line = Path(__file__).parent / "access.log"
+
+# log_pattern = re.compile(
+#     r'(?P<ip>\S+)\s+-\s+-\s+'
+#     r'\[(?P<datetime>[^\]]+)\]\s+'
+#     r'"(?P<method>\S+)\s+'
+#     r'(?P<path>\S+)\s+'
+#     r'(?P<protocol>[^"]+)"\s+'
+#     r'(?P<status>\d{3})\s+'
+#     r'(?P<size>\d+)'
+# )
+
+# total_lines = 0
+# success_lines = 0
+# failed_lines = 0
+# printed = 0
+
+
+# print("\n=======처음 5줄=======\n")
+
+# with open(parse_line, "r", encoding="utf-8") as f:
+#     for line in f:
+#         total_lines += 1
+#         line = line.strip()
+
+#         if not line:
+#             failed_lines += 1
+#             continue
+
+#         match = log_pattern.fullmatch(line)
+#         if match:
+#             success_lines += 1
+#             result = {
+#                 "ip": match.group("ip"),
+#                 "datetime": match.group("datetime"),
+#                 "method": match.group("method"),
+#                 "url": match.group("path"),
+#                 "status": int(match.group("status"))
+#             }
+#             if printed < 5:
+#                 print(result)
+#                 print("\n")
+#                 printed += 1
+#         else:
+#             failed_lines += 1
+
+# print(f"전체 줄 수: {total_lines} / 건너뛴 줄 수: {failed_lines} / 파싱 성공: {success_lines} ")
+
+
+# --- 단계 2. 상태코드별 집계 ---
+# 요구사항: 전체 로그의 상태코드별 요청 수를 집계해 출력한다
+# 🤔 힌트: 1일차의 딕셔너리 카운팅 패턴
+#   status_counts[code] = status_counts.get(code, 0) + 1
+# 기대 출력 형식
+#   === 상태코드별 요청 수 ===
+#   200: 1523
+#   404: 87
+# 🏁 개수의 총합이 (전체 줄 수 - 건너뛴 줄 수)와 일치하면 성공!
+
+# TODO: AI에게 받은 코드를 검증 후 여기에 붙여넣기
+# import re
+# from pathlib import Path
+
+# parse_line = Path(__file__).parent / "access.log"
+
+# log_pattern = re.compile(
+#     r'(?P<ip>\S+)\s+-\s+-\s+'
+#     r'\[(?P<datetime>[^\]]+)\]\s+'
+#     r'"(?P<method>\S+)\s+'
+#     r'(?P<path>\S+)\s+'
+#     r'(?P<protocol>[^"]+)"\s+'
+#     r'(?P<status>\d{3})\s+'
+#     r'(?P<size>\d+)'
+# )
+
+# total_lines = 0
+# success_lines = 0
+# failed_lines = 0
+# printed = 0
+
+
+# print("\n=======처음 5줄=======\n")
+
+# with open(parse_line, "r", encoding="utf-8") as f:
+#     status_counts = {}
+#     # {200: 1}                # 첫 번째 200
+#     # {200: 1, 404: 1}        # 404 등장
+#     for line in f:
+#         total_lines += 1
+#         line = line.strip()
+
+#         if not line:
+#             failed_lines += 1
+#             continue
+
+#         match = log_pattern.fullmatch(line)
+#         if match:
+#             code = int(match.group("status"))
+#             # 처음 등장한 상태코드는 0으로 시작하고, 이후 등장할 때마다 1씩 증가.
+#             status_counts[code] = status_counts.get(code, 0) + 1
+#             success_lines += 1
+#             result = {
+#                 "ip": match.group("ip"),
+#                 "datetime": match.group("datetime"),
+#                 "method": match.group("method"),
+#                 "url": match.group("path"),
+#                 "status": int(match.group("status"))
+#             }
+#             if printed < 5:
+#                 print(result)
+#                 print("\n")
+#                 printed += 1
+#         else:
+#             failed_lines += 1
+
+
+# total_status = sum(status_counts.values())
+
+
+# print(f"\n전체 줄 수: {total_lines} / 건너뛴 줄 수: {failed_lines} / 파싱 성공: {success_lines}\n")
+
+
+# print("============ 상태 코드별 요청 수 ============\n")
+
+# for code in sorted(status_counts):
+#     print(f"{code} 응답: {status_counts[code]}")
+
+
+# print(f"\n상태코드 합계: {total_status}\n")
+# # --- 단계 3. 시간대별 집계 ---
+# 요구사항: 시각 문자열에서 시(hour)만 추출해 0~23시 요청 수를 집계해 출력한다
+# 🤔 힌트: "07/Jul/2026:14:23:45 +0900" 을 콜론(:)으로 자르면 두 번째 파트가 시
+#   hour = time_str.split(":")[1]     # "14"
+#   정렬 출력: for hour in sorted(hourly_counts.keys()): ...
+#   변수 이름은 hourly_counts 로 해주세요. (마무리의 json 저장에서 사용합니다)
+#   시(hour)를 int()로 바꾸지 마세요. "00" 같은 두 자리 문자열이어야 내일 대시보드와 연결됩니다.
+# 기대 출력 형식
+#   === 시간대별 요청 수 ===
+#   00시: 12
+#   ...
+#   23시: 31
+# 🏁 0~23시 순서대로 정렬되어 출력되면 성공!
+
+# TODO: AI에게 받은 코드를 검증 후 여기에 붙여넣기
 import re
 from pathlib import Path
 
@@ -48,6 +195,11 @@ printed = 0
 print("\n=======처음 5줄=======\n")
 
 with open(parse_line, "r", encoding="utf-8") as f:
+    hourly_counts = {}
+    # 시간체크
+    status_counts = {}
+    # {200: 1}                # 첫 번째 200
+    # {200: 1, 404: 1}        # 404 등장
     for line in f:
         total_lines += 1
         line = line.strip()
@@ -58,6 +210,12 @@ with open(parse_line, "r", encoding="utf-8") as f:
 
         match = log_pattern.fullmatch(line)
         if match:
+            code = int(match.group("status"))
+            # 처음 등장한 상태코드는 0으로 시작하고, 이후 등장할 때마다 1씩 증가.
+            status_counts[code] = status_counts.get(code, 0) + 1
+            time_str = match.group("datetime")
+            hour = time_str.split(":")[1]   # "14"처럼 두 자리 문자열
+            hourly_counts[hour] = hourly_counts.get(hour, 0) + 1
             success_lines += 1
             result = {
                 "ip": match.group("ip"),
@@ -73,37 +231,26 @@ with open(parse_line, "r", encoding="utf-8") as f:
         else:
             failed_lines += 1
 
-print(f"전체 줄 수: {total_lines} / 건너뛴 줄 수: {failed_lines} / 파싱 성공: {success_lines} ")
 
-# --- 단계 2. 상태코드별 집계 ---
-# 요구사항: 전체 로그의 상태코드별 요청 수를 집계해 출력한다
-# 🤔 힌트: 1일차의 딕셔너리 카운팅 패턴
-#   status_counts[code] = status_counts.get(code, 0) + 1
-# 기대 출력 형식
-#   === 상태코드별 요청 수 ===
-#   200: 1523
-#   404: 87
-# 🏁 개수의 총합이 (전체 줄 수 - 건너뛴 줄 수)와 일치하면 성공!
-
-# TODO: AI에게 받은 코드를 검증 후 여기에 붙여넣기
+total_status = sum(status_counts.values())
 
 
-# # --- 단계 3. 시간대별 집계 ---
-# 요구사항: 시각 문자열에서 시(hour)만 추출해 0~23시 요청 수를 집계해 출력한다
-# 🤔 힌트: "07/Jul/2026:14:23:45 +0900" 을 콜론(:)으로 자르면 두 번째 파트가 시
-#   hour = time_str.split(":")[1]     # "14"
-#   정렬 출력: for hour in sorted(hourly_counts.keys()): ...
-#   변수 이름은 hourly_counts 로 해주세요. (마무리의 json 저장에서 사용합니다)
-#   시(hour)를 int()로 바꾸지 마세요. "00" 같은 두 자리 문자열이어야 내일 대시보드와 연결됩니다.
-# 기대 출력 형식
-#   === 시간대별 요청 수 ===
-#   00시: 12
-#   ...
-#   23시: 31
-# 🏁 0~23시 순서대로 정렬되어 출력되면 성공!
+print(f"\n전체 줄 수: {total_lines} / 건너뛴 줄 수: {failed_lines} / 파싱 성공: {success_lines}\n")
 
-# TODO: AI에게 받은 코드를 검증 후 여기에 붙여넣기
 
+print("============ 상태 코드별 요청 수 ============\n")
+
+for code in sorted(status_counts):
+    print(f"{code} 응답: {status_counts[code]}")
+
+
+print(f"\n상태코드 합계: {total_status}\n")
+
+
+print("============ 시간대별 요청수 ============\n")
+
+for hour in sorted(hourly_counts.keys()):
+    print(f"{hour}시: {hourly_counts[hour]}")
 
 # --- 단계 4. 에러 URL TOP 5 ---
 # 요구사항
