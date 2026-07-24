@@ -394,21 +394,24 @@ for rank, (ip, count) in enumerate(top_ip, start=1):
 # for hour in sorted(hourly_counts.keys()):
 #     print(f"{hour}시: {hourly_counts[hour]}")
 
+# 의심 IP 탐지: 요청 수 TOP 5 IP
+
 
 # --- 마무리. 결과를 results.json으로 저장 ---
 # 단계 4까지 완성한 뒤, 아래 주석을 해제하세요.
 # ★ 키 이름(status_counts / hourly_counts / top_error_urls)은
 #   한 글자도 바꾸지 마세요. 내일 대시보드와 연결되는 이름입니다.
 
-# import json
+import json
 
-# results = {
-#     "status_counts": status_counts,
-#     "hourly_counts": hourly_counts,
-#     "top_error_urls": top_error_urls
-# }
+results = {
+    "status_counts": status_counts,
+    "hourly_counts": hourly_counts,
+    "top_error_urls": top_error_urls,
+    "top_ip": top_ip
+}
 
-# with open("results.json", "w", encoding="utf-8") as f:
-#     json.dump(results, f, ensure_ascii=False, indent=2)
+with open("results.json", "w", encoding="utf-8") as f:
+    json.dump(results, f, ensure_ascii=False, indent=2)
 
-# print("results.json 저장 완료")
+print("results.json 저장 완료")
