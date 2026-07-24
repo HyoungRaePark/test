@@ -1,0 +1,417 @@
+# =====================================================
+# 로그 분석 만들기 실습 - log_analyzer.py
+# =====================================================
+# 오늘의 미션: 아래 4단계를 순서대로 완성하세요.
+# access.log를 파싱해 상태코드별/시간대별/에러 URL 통계를 내고
+# results.json으로 저장합니다. (내일 대시보드에서 사용)
+
+# ❗단계마다 commit 합니다.
+# - 터미널로 commit 한다면
+#    git add . 
+#    git commit -m "precourse day3: 단계N ... 완료"
+# - vscode로 commit 한다면
+#    코드 저장(ctrl + s) -> 소스 컨트롤 탭 누르기 -> 파일 stage 올리기 -> 커밋 메세지 작성 -> 커밋 버튼
+
+# --- 단계 1. 파싱 ---
+# 요구사항
+#   - access.log를 한 줄씩 읽는다
+#   - 각 줄에서 IP, 시각 문자열, HTTP 메서드, URL, 상태코드(정수)를 추출한다
+#   - 확인용으로 처음 5줄의 추출 결과를 출력한다
+#   - 마지막에 전체 줄 수를 출력한다 (단계 2의 검산에 사용)
+# ⚠️ 이 로그에는 형식이 깨진 줄이 섞여 있습니다! IndexError/ValueError가 나면
+#    2일차처럼 에러 메시지를 AI에게 전달하고, 깨진 줄은 건너뛰고
+#    건너뛴 줄 수를 출력하도록 수정을 요청하세요.
+# 🏁 처음 5줄의 파싱 결과와 건너뛴 줄 수가 출력되면 성공!
+
+# TODO: AI에게 받은 코드를 검증 후 여기에 붙여넣기
+# import re
+# from pathlib import Path
+
+# parse_line = Path(__file__).parent / "access.log"
+
+# log_pattern = re.compile(
+#     r'(?P<ip>\S+)\s+-\s+-\s+'
+#     r'\[(?P<datetime>[^\]]+)\]\s+'
+#     r'"(?P<method>\S+)\s+'
+#     r'(?P<path>\S+)\s+'
+#     r'(?P<protocol>[^"]+)"\s+'
+#     r'(?P<status>\d{3})\s+'
+#     r'(?P<size>\d+)'
+# )
+
+# total_lines = 0
+# success_lines = 0
+# failed_lines = 0
+# printed = 0
+
+
+# print("\n=======처음 5줄=======\n")
+
+# with open(parse_line, "r", encoding="utf-8") as f:
+#     for line in f:
+#         total_lines += 1
+#         line = line.strip()
+
+#         if not line:
+#             failed_lines += 1
+#             continue
+
+#         match = log_pattern.fullmatch(line)
+#         if match:
+#             success_lines += 1
+#             result = {
+#                 "ip": match.group("ip"),
+#                 "datetime": match.group("datetime"),
+#                 "method": match.group("method"),
+#                 "url": match.group("path"),
+#                 "status": int(match.group("status"))
+#             }
+#             if printed < 5:
+#                 print(result)
+#                 print("\n")
+#                 printed += 1
+#         else:
+#             failed_lines += 1
+
+# print(f"전체 줄 수: {total_lines} / 건너뛴 줄 수: {failed_lines} / 파싱 성공: {success_lines} ")
+
+
+# --- 단계 2. 상태코드별 집계 ---
+# 요구사항: 전체 로그의 상태코드별 요청 수를 집계해 출력한다
+# 🤔 힌트: 1일차의 딕셔너리 카운팅 패턴
+#   status_counts[code] = status_counts.get(code, 0) + 1
+# 기대 출력 형식
+#   === 상태코드별 요청 수 ===
+#   200: 1523
+#   404: 87
+# 🏁 개수의 총합이 (전체 줄 수 - 건너뛴 줄 수)와 일치하면 성공!
+
+# TODO: AI에게 받은 코드를 검증 후 여기에 붙여넣기
+# import re
+# from pathlib import Path
+
+# parse_line = Path(__file__).parent / "access.log"
+
+# log_pattern = re.compile(
+#     r'(?P<ip>\S+)\s+-\s+-\s+'
+#     r'\[(?P<datetime>[^\]]+)\]\s+'
+#     r'"(?P<method>\S+)\s+'
+#     r'(?P<path>\S+)\s+'
+#     r'(?P<protocol>[^"]+)"\s+'
+#     r'(?P<status>\d{3})\s+'
+#     r'(?P<size>\d+)'
+# )
+
+# total_lines = 0
+# success_lines = 0
+# failed_lines = 0
+# printed = 0
+
+
+# print("\n=======처음 5줄=======\n")
+
+# with open(parse_line, "r", encoding="utf-8") as f:
+#     status_counts = {}
+#     # {200: 1}                # 첫 번째 200
+#     # {200: 1, 404: 1}        # 404 등장
+#     for line in f:
+#         total_lines += 1
+#         line = line.strip()
+
+#         if not line:
+#             failed_lines += 1
+#             continue
+
+#         match = log_pattern.fullmatch(line)
+#         if match:
+#             code = int(match.group("status"))
+#             # 처음 등장한 상태코드는 0으로 시작하고, 이후 등장할 때마다 1씩 증가.
+#             status_counts[code] = status_counts.get(code, 0) + 1
+#             success_lines += 1
+#             result = {
+#                 "ip": match.group("ip"),
+#                 "datetime": match.group("datetime"),
+#                 "method": match.group("method"),
+#                 "url": match.group("path"),
+#                 "status": int(match.group("status"))
+#             }
+#             if printed < 5:
+#                 print(result)
+#                 print("\n")
+#                 printed += 1
+#         else:
+#             failed_lines += 1
+
+
+# total_status = sum(status_counts.values())
+
+
+# print(f"\n전체 줄 수: {total_lines} / 건너뛴 줄 수: {failed_lines} / 파싱 성공: {success_lines}\n")
+
+
+# print("============ 상태 코드별 요청 수 ============\n")
+
+# for code in sorted(status_counts):
+#     print(f"{code} 응답: {status_counts[code]}")
+
+
+# print(f"\n상태코드 합계: {total_status}\n")
+# # --- 단계 3. 시간대별 집계 ---
+# 요구사항: 시각 문자열에서 시(hour)만 추출해 0~23시 요청 수를 집계해 출력한다
+# 🤔 힌트: "07/Jul/2026:14:23:45 +0900" 을 콜론(:)으로 자르면 두 번째 파트가 시
+#   hour = time_str.split(":")[1]     # "14"
+#   정렬 출력: for hour in sorted(hourly_counts.keys()): ...
+#   변수 이름은 hourly_counts 로 해주세요. (마무리의 json 저장에서 사용합니다)
+#   시(hour)를 int()로 바꾸지 마세요. "00" 같은 두 자리 문자열이어야 내일 대시보드와 연결됩니다.
+# 기대 출력 형식
+#   === 시간대별 요청 수 ===
+#   00시: 12
+#   ...
+#   23시: 31
+# 🏁 0~23시 순서대로 정렬되어 출력되면 성공!
+
+# TODO: AI에게 받은 코드를 검증 후 여기에 붙여넣기
+# import re
+# from pathlib import Path
+
+# parse_line = Path(__file__).parent / "access.log"
+
+# log_pattern = re.compile(
+#     r'(?P<ip>\S+)\s+-\s+-\s+'
+#     r'\[(?P<datetime>[^\]]+)\]\s+'
+#     r'"(?P<method>\S+)\s+'
+#     r'(?P<path>\S+)\s+'
+#     r'(?P<protocol>[^"]+)"\s+'
+#     r'(?P<status>\d{3})\s+'
+#     r'(?P<size>\d+)'
+# )
+
+# total_lines = 0
+# success_lines = 0
+# failed_lines = 0
+# printed = 0
+
+
+# print("\n=======처음 5줄=======\n")
+
+# with open(parse_line, "r", encoding="utf-8") as f:
+#     hourly_counts = {}
+#     # 시간체크
+#     status_counts = {}
+#     # {200: 1}                # 첫 번째 200
+#     # {200: 1, 404: 1}        # 404 등장
+#     for line in f:
+#         total_lines += 1
+#         line = line.strip()
+
+#         if not line:
+#             failed_lines += 1
+#             continue
+
+#         match = log_pattern.fullmatch(line)
+#         if match:
+#             code = int(match.group("status"))
+#             # 처음 등장한 상태코드는 0으로 시작하고, 이후 등장할 때마다 1씩 증가.
+#             status_counts[code] = status_counts.get(code, 0) + 1
+#             time_str = match.group("datetime")
+#             hour = time_str.split(":")[1]   # "14"처럼 두 자리 문자열
+#             hourly_counts[hour] = hourly_counts.get(hour, 0) + 1
+#             success_lines += 1
+#             result = {
+#                 "ip": match.group("ip"),
+#                 "datetime": match.group("datetime"),
+#                 "method": match.group("method"),
+#                 "url": match.group("path"),
+#                 "status": int(match.group("status"))
+#             }
+#             if printed < 5:
+#                 print(result)
+#                 print("\n")
+#                 printed += 1
+#         else:
+#             failed_lines += 1
+
+
+# total_status = sum(status_counts.values())
+
+
+# print(f"\n전체 줄 수: {total_lines} / 건너뛴 줄 수: {failed_lines} / 파싱 성공: {success_lines}\n")
+
+
+# print("============ 상태 코드별 요청 수 ============\n")
+
+# for code in sorted(status_counts):
+#     print(f"{code} 응답: {status_counts[code]}")
+
+
+# print(f"\n상태코드 합계: {total_status}\n")
+
+
+# print("============ 시간대별 요청수 ============\n")
+
+# for hour in sorted(hourly_counts.keys()):
+#     print(f"{hour}시: {hourly_counts[hour]}")
+
+# --- 단계 4. 에러 URL TOP 5 ---
+# 요구사항
+#   - 상태코드가 400 이상인 요청만 대상으로 URL별 발생 횟수를 집계한다
+#   - 발생 횟수가 많은 순서로 상위 5개를 출력한다
+# 🤔 힌트: 값 기준 내림차순 정렬 후 상위 5개 자르기
+#   top5 = sorted(error_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+#   for rank, (url, cnt) in enumerate(top5, start=1):
+#       print(f"{rank}위: {url} ({cnt}회)")
+#   lambda가 낯설다면 AI에게 이 두 줄의 동작 설명을 요청해 보세요.
+# 기대 출력 형식
+#   === 에러 최다 URL TOP 5 ===
+#   1위: /api/payment (37회)
+# 🏁 에러 URL 상위 5개가 횟수와 함께 출력되면 성공!
+# ⚠️ 출력까지 끝났다면, 마무리의 json 저장에서 쓸 수 있도록
+#    아래 한 줄을 추가해 top_error_urls 변수를 만들어 두세요.
+#   top_error_urls = [list(t) for t in top5]   # [[URL, 횟수], ...] 형태
+
+# TODO: AI에게 받은 코드를 검증 후 여기에 붙여넣기
+import re
+from pathlib import Path
+
+parse_line = Path(__file__).parent / "access.log"
+
+log_pattern = re.compile(
+    r'(?P<ip>\S+)\s+-\s+-\s+'
+    r'\[(?P<datetime>[^\]]+)\]\s+'
+    r'"(?P<method>\S+)\s+'
+    r'(?P<path>\S+)\s+'
+    r'(?P<protocol>[^"]+)"\s+'
+    r'(?P<status>\d{3})\s+'
+    r'(?P<size>\d+)'
+)
+
+total_lines = 0
+success_lines = 0
+failed_lines = 0
+printed = 0
+
+
+print("\n=======처음 5줄=======\n")
+
+with open(parse_line, "r", encoding="utf-8") as f:
+    hourly_counts = {}
+    status_counts = {}
+    error_url_counts = {}
+    ip_counts = {}
+
+    for line in f:
+        total_lines += 1
+        line = line.strip()
+
+        if not line:
+            failed_lines += 1
+            continue
+
+        match = log_pattern.fullmatch(line)
+
+        if match:
+            code = int(match.group("status"))
+            url = match.group("path")
+            # ip 접속 많은 횟수 분류 
+            ip = match.group("ip")   
+
+
+            # 상태코드별 요청 수 집계
+            status_counts[code] = status_counts.get(code, 0) + 1
+
+            # 시간대별 요청 수 집계
+            time_str = match.group("datetime")
+            hour = time_str.split(":")[1]
+            hourly_counts[hour] = hourly_counts.get(hour, 0) + 1
+
+            # 상태코드가 400 이상인 URL만 집계
+            if code >= 400:
+                error_url_counts[url] = error_url_counts.get(url, 0) + 1
+
+            # ip 접속이 많은 순으로 집계
+            ip_counts[ip] = ip_counts.get(ip,0)+1
+
+            success_lines += 1
+
+            result = {
+                "ip": match.group("ip"),
+                "datetime": match.group("datetime"),
+                "method": match.group("method"),
+                "url": url,
+                "status": code
+            }
+
+            if printed < 5:
+                print(result)
+                print()
+                printed += 1
+
+        else:
+            failed_lines += 1
+
+
+total_status = sum(status_counts.values())
+
+top_error_urls = sorted(
+    error_url_counts.items(),
+    key=lambda x: x[1],
+    reverse=True
+)[:5]
+
+
+top_ip = sorted(
+    ip_counts.items(),
+    key=lambda x: x[1],
+    reverse=True
+)[:5]
+
+print(
+    f"\n전체 줄 수: {total_lines} / "
+    f"건너뛴 줄 수: {failed_lines} / "
+    f"파싱 성공: {success_lines}\n"
+)
+
+print("============ 상태 코드별 요청 수 ============\n")
+
+for code in sorted(status_counts):
+    print(f"{code} 응답: {status_counts[code]}")
+
+print(f"\n상태코드 합계: {total_status}\n")
+
+print("\n=== 에러 최다 URL TOP 5 ===")
+
+for rank, (url, count) in enumerate(top_error_urls, start=1):
+    print(f"{rank}위: {url} ({count}회)")
+
+
+print("\n=== IP 요청 최다 TOP 5 ===")
+
+for rank, (ip, count) in enumerate(top_ip, start=1):
+    print(f"{rank}위: {ip} ({count}회)")    
+
+# print("============ 시간대별 요청수 ============\n")
+
+# for hour in sorted(hourly_counts.keys()):
+#     print(f"{hour}시: {hourly_counts[hour]}")
+
+# 의심 IP 탐지: 요청 수 TOP 5 IP
+
+
+# --- 마무리. 결과를 results.json으로 저장 ---
+# 단계 4까지 완성한 뒤, 아래 주석을 해제하세요.
+# ★ 키 이름(status_counts / hourly_counts / top_error_urls)은
+#   한 글자도 바꾸지 마세요. 내일 대시보드와 연결되는 이름입니다.
+
+import json
+
+results = {
+    "status_counts": status_counts,
+    "hourly_counts": hourly_counts,
+    "top_error_urls": top_error_urls,
+    "top_ip": top_ip
+}
+
+with open("results.json", "w", encoding="utf-8") as f:
+    json.dump(results, f, ensure_ascii=False, indent=2)
+
+print("results.json 저장 완료")
